@@ -3,7 +3,7 @@ module cli-doc-gen
 go 1.19
 
 require (
-	github.com/morty-faas/cli v1.0.1
+	github.com/morty-faas/cli v1.0.0
 	github.com/spf13/cobra v1.7.0
 	golang.org/x/text v0.7.0
 )
