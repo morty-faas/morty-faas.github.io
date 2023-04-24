@@ -1,3 +1,23 @@
 ---
 title: "Architecture"
 ---
+
+# Architecture
+
+This page describes the high-level architecture of Morty. The goal of this document is to give anyone interested in contributing to Morty a high-level overview of how it works. This tries to stay high level to guide to the right area of Morty, but stops short of explaining in detail how something might work since it's easy for that to get out of sync with the codebase.
+
+![Architecture overview](/morty-architecture-simple.png)
+
+## Components
+
+Currently, Morty has 4 components :
+
+- [Morty CLI](https://github.com/morty-faas/cli): The CLI allows developer to create, build and invoke functions.
+- [Morty Controller](https://github.com/morty-fass/gateway): The controller is responsible for managing functions of a Morty instance. It will maintain a state of all the registered functions, and will communicate with the underlying orchestrator to ask for instances when needed. Please see below for [compatible orchestration systems](#orchestration).
+- [Morty Registry](#): The registry is responsible for building and providing access to function images to the orchestrator.
+- [Alpha](#): Alpha is a little agent embedded in the function images that will fork the runtime process for your function and monitor it.
+
+## Orchestration
+
+Today, Morty can only work with the [RIK](https://github.com/rik-org/rik) workload orchestrator. [RIK](https://github.com/rik-org/rik) is maintained by some of the Morty's core maintainers. It is currently considered as an entire component of the Morty architecture,
+but we would like to support more orchestrators like [Kubernetes](https://kubernetes.io) in the future.
