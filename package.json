@@ -1,8 +1,7 @@
 {
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "export": "next build && next export"
+    "build": "next build"
   },
   "dependencies": {
     "next": "13.3.0",

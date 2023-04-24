@@ -16,6 +16,6 @@
   "architecture": "Architecture",
   "-- Developer --": {
     "type": "separator",
-    "title": "Contributing"
+    "title": "Developer Guide"
   }
 }

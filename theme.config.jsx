@@ -27,6 +27,9 @@ export default {
   project: {
     link: 'https://github.com/morty-faas',
   },
+  editLink: {
+    text: 'Edit this page on GitHub →'
+  },
   footer: {
     text: 'MIT 2023 © Morty maintainers.',
   },

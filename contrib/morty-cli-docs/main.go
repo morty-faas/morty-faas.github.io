@@ -34,7 +34,13 @@ func main() {
 		return fmt.Sprintf(fmTemplate, strings.Replace(base, "_", " ", -1))
 	}
 
-	err := doc.GenMarkdownTreeCustom(cmd.RootCmd, basePath, filePrepender, func(s string) string { return "" })
+	err := doc.GenMarkdownTreeCustom(cmd.RootCmd, basePath, filePrepender, func(s string) string {
+		base := strings.TrimSuffix(s, path.Ext(s))
+		if base == "morty" {
+			return "/docs/cli"
+		}
+		return "/docs/cli/" + strings.Replace(base, "_", "-", -1)
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -56,7 +62,7 @@ func main() {
 			}
 		}
 
-		return nil
+		return os.Rename(path, strings.Replace(path, "_", "-", -1))
 	})
 
 	if err != nil {
