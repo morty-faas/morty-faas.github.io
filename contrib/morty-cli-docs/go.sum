@@ -387,8 +387,8 @@ github.com/mitchellh/go-testing-interface v1.14.1 h1:jrgshOhYAUVNMAJiKbEu7EqAwgJ
 github.com/mitchellh/go-testing-interface v1.14.1/go.mod h1:gfgS7OtZj6MA4U1UrDRp04twqAjfvlZyCfX3sDjEym8=
 github.com/mitchellh/mapstructure v1.5.0 h1:jeMsZIYE/09sWLaz43PL7Gy6RuMjD2eJVyuac5Z2hdY=
 github.com/mitchellh/mapstructure v1.5.0/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RRV2QTWOzhPopBRo=
-github.com/morty-faas/cli v1.0.0 h1:MByTC0Ju2hqZARxyBFyQ/4eJckg4ps55lokaRBVvXRA=
-github.com/morty-faas/cli v1.0.0/go.mod h1:3mWO7lzqkrbaUqlf8lIo3mEP78CVMjZVcnfqTrDzzXk=
+github.com/morty-faas/cli v1.0.1 h1:EY1pD7iZGgVHQF2GqEKBrWuEEym+dZddSJZg5qcM3XM=
+github.com/morty-faas/cli v1.0.1/go.mod h1:3mWO7lzqkrbaUqlf8lIo3mEP78CVMjZVcnfqTrDzzXk=
 github.com/olekukonko/tablewriter v0.0.5 h1:P2Ga83D34wi1o9J6Wh1mRuqd4mF/x/lgBS7N7AbDhec=
 github.com/olekukonko/tablewriter v0.0.5/go.mod h1:hPp6KlRPjbx+hW8ykQs1w3UBbZlj6HuIJcUGPhkA7kY=
 github.com/oliveagle/jsonpath v0.0.0-20180606110733-2e52cf6e6852 h1:Yl0tPBa8QPjGmesFh1D0rDy+q1Twx6FyU7VWHi8wZbI=
