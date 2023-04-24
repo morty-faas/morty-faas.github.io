@@ -23,7 +23,7 @@ export default {
     dark: 270,
     light: 270,
   },
-  docsRepositoryBase: 'https://github.com/morty-faas/docs',
+  docsRepositoryBase: 'https://github.com/morty-faas/morty-faas.github.io/tree/main/',
   project: {
     link: 'https://github.com/morty-faas',
   },

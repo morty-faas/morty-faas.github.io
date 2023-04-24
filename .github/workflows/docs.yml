@@ -20,7 +20,18 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PUBLIC_REPOSITORY: ${{ github.repository }}
+      GOPRIVATE: github.com/polyxia-org/morty-gateway
+      GH_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
     steps:
+      - run: git config --global url.https://$GH_ACCESS_TOKEN@github.com/.insteadOf https://github.com/
+      - uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.19
+      - name: Build
+        working-directory: contrib/morty-cli-docs/
+        run: go run main.go
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0

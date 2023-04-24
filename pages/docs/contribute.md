@@ -124,7 +124,6 @@ Please consider signing the commit message at least with `Signed-Off-By`.
 
 - [Git](https://git-scm.com/)
 - [Go](https://golang.org/)
-- [Docker](https://www.docker.com/)
 
 ### Running code in your local environment
 
