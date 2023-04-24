@@ -34,5 +34,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-pages/docs/cli
-pages/docs/cli.md
+pages/docs/cli/**.md
