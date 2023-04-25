@@ -1,0 +1,23 @@
+---
+title: "Functions"
+description: ""
+---
+
+# What is a function ?
+
+In Morty, a function is a classic programming language function. The only difference is that the function, depending on the [runtime](./runtimes.mdx), will have a defined signature.
+
+For example, a JavaScript function for the default [Node.js runtime](https://github.com/morty-faas/runtimes/tree/main/template/node-19) will look like :
+
+```javascript
+exports.handler = async function (req, res) {
+  return res.status(200).send(JSON.stringify("My first function !"));
+};
+```
+
+Let's analyze the function signature :
+
+- `req` is an [Express request](https://expressjs.com/en/api.html#req.app) object, as the runtime use Express to handle its HTTP server.
+- `res` is an [Express response](https://expressjs.com/en/api.html#res.app) object, as the runtime use Express to handle its HTTP server.
+
+Like a classic API, you can use those two objects to retrieve information about your incoming request. Also, you have full control on the response you want to return.

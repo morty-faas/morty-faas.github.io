@@ -14,6 +14,8 @@
     "title": "Internals"
   },
   "architecture": "Architecture",
+  "functions": "Functions",
+  "runtimes": "Runtimes",
   "-- Developer --": {
     "type": "separator",
     "title": "Developer Guide"

@@ -1,0 +1,63 @@
+---
+title: "Runtimes"
+description: ""
+---
+
+import { Callout } from "nextra-theme-docs";
+
+# What is a runtime ?
+
+In Morty, a runtime is a re-usable program, written for a specific language, that will be injected into your function build. The runtime must run an HTTP server on the port **3000**, and all incoming requests will be sent to your function.
+
+<Callout type="warning" emoji="⚠️">
+  Currently, Morty supports only runtimes for programming languages that have an
+  HTTP server available in their libraries.
+</Callout>
+
+Below an example of a runtime for [Rust](https://www.rust-lang.org) programming language:
+
+```rust
+use axum::{routing::any, Router};
+use std::net::SocketAddr;
+
+#[tokio::main]
+async fn main() {
+    let app = Router::new()
+        .route("/", any(function::handler))
+        .route("/*path", any(function::handler));
+
+    let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
+    axum::Server::bind(&addr)
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
+}
+```
+
+As you can see, the code is simply an HTTP server using the [Axum](https://github.com/tokio-rs/axum) crate. You can notice that we map the routes `/` and `/*path` to `function::handler`. This implies that at build time, your function code will be injected into the `function` module in the working directory of the runtime.
+
+To make things clearer, let's considerate the following function:
+
+```rust
+use axum::{Json, response::IntoResponse, http::StatusCode};
+use axum::http::Request;
+
+/// `handler()` is a valid Axum route handler.
+/// You can use it like a classic handler in a Axum web application.
+/// See https://github.com/tokio-rs/axum for more details.
+pub async fn handler(req: Request<axum::body::Body>) -> impl IntoResponse {
+    println!("Function invoked with method={} and path={}", req.method(), req.uri());
+
+    (StatusCode::OK, Json("Hello, Rust runtime !"))
+}
+```
+
+Your final build directory will contain the following elements :
+
+```bash
+function/
+    Cargo.toml
+    handler.rs # Function code
+Cargo.toml
+main.rs # Runtime code
+```
