@@ -1,5 +1,5 @@
 ---
-title: 'Contributing'
+title: "Contributing"
 ---
 
 # Contributing to Morty
@@ -8,7 +8,7 @@ Thank you for investing your time in contributing to the Morty project!
 
 In this guide you will get an overview of the contribution workflow from opening an issue, creating a PR, committing your changes, and getting your PR merged.
 
-If you are lost at any point, don't hesitate to file an issue on [GitHub](https://github.com/morty-faas/morty-faas.github.io/issues/new?assignees=&labels=question&template=question.yml&title=%5BQUESTION%5D%3A+) ! 
+If you are lost at any point, don't hesitate to file an issue on [GitHub](https://github.com/morty-faas/morty-faas.github.io/issues/new?assignees=&labels=question&template=question.yml&title=%5BQUESTION%5D%3A+) !
 
 ## Getting started
 

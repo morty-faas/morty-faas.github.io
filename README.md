@@ -18,7 +18,7 @@ Please ensure that your environment match the following requirements :
 
 - [pnpm](https://pnpm.io/installation)
 - [NodeJS](https://nodejs.org/en/) (v17+)
- 
+
 To run the website locally :
 
 ```bash

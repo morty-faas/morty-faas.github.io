@@ -4,6 +4,7 @@
     "title": "Getting Started"
   },
   "index": "Introduction",
+  "quickstart": "Quickstart",
   "-- API Reference --": {
     "type": "separator",
     "title": "API Reference"
