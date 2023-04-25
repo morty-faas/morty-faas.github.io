@@ -8,14 +8,38 @@ Morty is very ligthweight, but has some minimum requirements as outlined below.
 
 ## Prerequisites
 
-- A virtual machine or a bare-metal server with a Linux-based distribution and the **x86_64** architecture
-- [Docker](https://docs.docker.com/get-docker/) and [Firecracker](https://github.com/firecracker-microvm/firecracker/blob/main/docs/getting-started.md) installed on the host
-- [Morty CLI](https://github.com/morty-faas/cli) installed on your local machine
+To install Morty, you need to have access to a virtual machine or a bare-metal server with a Linux-based (Debian 11+ for example) distribution and the **x86_64** architecture. Also, please ensure that your version of GLIBC is >= 2.29.
+
+### Remote server
+
+You need to have [Docker](https://docs.docker.com/engine/install/) and [Firecracker](https://github.com/firecracker-microvm/firecracker/tree/main#getting-started) installed on the host. You can install those tools using the respective official documentations, or by using the following commands: 
+
+**Install [Docker](https://docs.docker.com/engine/install/)**: 
+
+```bash
+curl -fsSL https://get.docker.com | sudo sh
+```
+
+**Install [Firecracker](https://github.com/firecracker-microvm/firecracker/tree/main#getting-started)**:
+
+```bash
+curl -sL -o firecracker.tgz https://github.com/firecracker-microvm/firecracker/releases/download/v1.3.1/firecracker-v1.3.1-x86_64.tgz
+tar -xvf firecracker.tgz -C firecracker
+sudo mv ./firecracker/release-v1.3.1-x86_64/firecracker-v1.3.1-x86_64 /usr/bin/firecracker
+```
+
+### Local machine
 
 <Callout type="info">
   [Morty CLI](https://github.com/morty-faas/cli) is available for all
   architectures.
 </Callout>
+
+**Install [Morty CLI](https://github.com/morty-faas/cli)**:
+
+```bash
+curl -fsSL https://morty-faas.github.io/install-cli.sh | sudo sh
+```
 
 ## Install RIK
 
@@ -280,19 +304,19 @@ Open http://localhost:9001 in your browser, enter your credentials (minioadmin, 
 
 To install the Morty controller, you need first to create a configuration file in `/etc/morty/controller.yaml`:
 
-```yaml
-# /etc/morty/controller.yaml
+```bash
+mkdir -p /etc/morty
+cat <<EOF | sudo tee /etc/morty/controller.yaml
 port: 8080
 
 orchestrator:
   rik:
-    # Here replace the ${IF_NET_IP} by the IP of your network interface.
-    # You should have it in your environment if you've correctly installed the RIK orchestrator.
     cluster: http://${IF_NET_IP}:5000
 
 state:
   redis:
     addr: localhost:6379
+EOF
 ```
 
 Now, you can generate the service file for the Morty controller:
