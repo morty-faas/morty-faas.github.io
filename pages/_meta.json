@@ -11,6 +11,7 @@
     "title": "Recipes"
   },
   "serverless-api": "Serverless API",
+  "discord-publisher": "Discord message publisher",
   "-- API Reference --": {
     "type": "separator",
     "title": "API Reference"

@@ -1,0 +1,209 @@
+---
+title: Build a Discord publisher
+description: In this recipe, you will learn how to create a Discord message publisher based on Discord webhooks.
+---
+
+# How to build a Discord message publisher
+
+This recipe will help you to build a fully functional Discord webhook publisher and deploy it to [Morty](/). The function will allow you to publish custom messages to a dedicated channel on a Discord server.
+
+## Prerequisites
+
+For this recipe, you need to have access to an up and running Morty instance. Please refer to the [deployment guide](./deployment.mdx) to deploy Morty on your own infrastructure. Also, you need to have the [Morty CLI](https://github.com/morty-faas/cli) installed on your machine. If you don't have already installed, you can run the following command to install it:
+
+```bash
+curl -fsSL https://morty-faas.github.io/install-cli.sh | sudo sh
+```
+
+We will use the [Go](https://go.dev/) programming language for this recipe. The code will be explained so beginners will be able to follow this recipe.
+
+Finally, you will need to have a valid Discord webhook URL. If you don't have this right now, please refer to the Discord official documentation to learn [how to create a webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks).
+
+## Develop the function
+
+Let's start our code session ! First of all, we will initialize a new blank function based on the Morty's Go runtime, `go-1.19`: 
+
+```bash
+morty fn init -r go-1.19 discord-webhook-publisher
+```
+
+Open the function folder `discord-webhook-publisher` in your favorite IDE or code editor, and open the `handler.go` file. You can remove all the boilerplate code present in the function `Handler()`, we will start from a blank code. Your code should now look like :
+
+```go
+package function
+
+func Handler (w http.ResponseWriter, r *http.Request) {
+	// We will place our custom code here
+}
+```
+
+Now, we need to create a constant for our webhook URL. Update the code to add a new constant, `webhookUrl` :
+
+```go
+package function
+
+// Declare the constant here
+const webhookUrl = "YOUR_WEBHOOK_URL"
+
+func Handler (w http.ResponseWriter, r *http.Request) {}
+```
+
+We will now add some business logic into our function. The first step is to check the incoming HTTP request method. We want our function to work only if the HTTP method is POST. Also, the function will return an `HTTP 204 No Content` if there are no errors.
+
+```go 
+package function
+
+// Declare the constant here
+const webhookUrl = "YOUR_WEBHOOK_URL"
+
+func Handler (w http.ResponseWriter, r *http.Request) {
+    // If the incoming request is not POST,
+    // we return a HTTP 405 Method Not Allowed
+    if r.Method != http.MethodPost {
+		http.Error(w, "This function accept only POST requests.", http.StatusMethodNotAllowed)
+		return
+	}
+
+    // Send the HTTP 204 No Content
+    w.WriteHeader(http.StatusNoContent)
+}
+```
+
+We now need to parse the request body to retrieve the message. The body the request will accept will have the following format:
+
+```json
+{
+    "message": "The message to send to the Discord channel"
+}
+```
+
+Let's add the piece of code allowing us to do that :
+
+```go
+package function
+
+// Declare the constant here
+const webhookUrl = "YOUR_WEBHOOK_URL"
+
+// Data Transfer Object for the request
+type PublishMessageRequest struct {
+	Message string `json:"message"`
+}
+
+func Handler (w http.ResponseWriter, r *http.Request) {
+    // If the incoming request is not POST,
+    // we return a HTTP 405 Method Not Allowed
+    if r.Method != http.MethodPost {
+		http.Error(w, "This function accept only POST requests.", http.StatusMethodNotAllowed)
+		return
+	}
+    
+    // Decode the request body, and if an error occurs,
+	// return a HTTP 400 Bad Request error
+	dto := &PublishMessageRequest{}
+	if err := json.NewDecoder(r.Body).Decode(dto); err != nil {
+		http.Error(w, fmt.Sprintf("Unable to decode request body: %v", err), http.StatusBadRequest)
+		return
+	}
+    
+    // Send the HTTP 204 No Content
+    w.WriteHeader(http.StatusNoContent)
+}
+```
+
+Seems right no ? The only things that is missing is the request to the webhook. Let's fix that :
+
+```go
+package function
+
+// Declare the constant here
+const webhookUrl = "YOUR_WEBHOOK_URL"
+
+// Data Transfer Object for the request
+type PublishMessageRequest struct {
+	Message string `json:"message"`
+}
+
+func Handler (w http.ResponseWriter, r *http.Request) {
+    // If the incoming request is not POST,
+    // we return a HTTP 405 Method Not Allowed
+    if r.Method != http.MethodPost {
+		http.Error(w, "This function accept only POST requests.", http.StatusMethodNotAllowed)
+		return
+	}
+    
+    // Decode the request body, and if an error occurs,
+	// return a HTTP 400 Bad Request error
+	dto := &PublishMessageRequest{}
+	if err := json.NewDecoder(r.Body).Decode(dto); err != nil {
+		http.Error(w, fmt.Sprintf("Unable to decode request body: %v", err), http.StatusBadRequest)
+		return
+	}
+
+    // Create a valid JSON request body for the webhook.
+    // https://discord.com/developers/docs/resources/webhook#execute-webhook
+	data, _ := json.Marshal(map[string]interface{}{
+		"user":    "Morty",
+		"content": dto.Message,
+	})
+
+    // Create the request and execute it
+	req, _ := http.NewRequest(http.MethodPost, webhookUrl, bytes.NewReader(data))
+	req.Header.Add("Content-Type", "application/json")
+
+	if _, err := http.DefaultClient.Do(req); err != nil {
+		http.Error(w, fmt.Sprintf("failed to send data to webhook: %v", err), http.StatusInternalServerError)
+		return
+	}
+    
+    // Send the HTTP 204 No Content
+    w.WriteHeader(http.StatusNoContent)
+}
+```
+
+Et voilà ! Our code seems good and ready to work ! In the next section, we will deploy our function to a Morty instance, and invoke it !
+
+## Deploy the function
+
+To deploy the function, it's a breeze. First ensure that your `morty` CLI targets the good context using the following command :
+
+```bash
+morty config current-context
+```
+
+Ready ? Build your function !
+
+```bash
+morty fn build discord-webhook-publisher
+```
+
+## Test our publisher
+
+The long-awaited moment has arrived. After a lot of efforts, its time to try our function ! Let's start with the HTTP method verification. We want to be sure that we cannot send requests with other HTTP methods than `POST` :
+
+```bash
+morty fn invoke discord-webhook-publisher -X GET
+```
+
+If everything is ok, you should see an error message `This function accept only POST requests`.
+
+So now, let's try to send a message :
+
+```bash
+morty fn invoke discord-webhook-publisher \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d '{"message": "Hello from my Discord publisher !"}'
+```
+
+On the Discord channel where the webhook was configured, you should have a message from `Morty`: 
+
+![Discord webhook result](/discord-webhook-result.png)
+
+
+
+
+
+
+
+

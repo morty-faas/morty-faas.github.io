@@ -1,5 +1,6 @@
 ---
 title: "Contributing"
+description: Interested in Morty ? Discover how to contribute to the project.
 ---
 
 # Contributing to Morty
