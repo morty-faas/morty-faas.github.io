@@ -19,5 +19,7 @@
   "-- Developer --": {
     "type": "separator",
     "title": "Developer Guide"
-  }
+  },
+  "deployment": "Deployment",
+  "contribute": "Contributing"
 }

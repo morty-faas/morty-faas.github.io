@@ -1,0 +1,392 @@
+import { Callout } from "nextra-theme-docs";
+import { Steps } from "nextra-theme-docs";
+
+# Deploy Morty on your infrastructure
+
+This page will cover all technical requirements and details in order to successfully set-up a ready-to-use Morty instance.
+Morty is very ligthweight, but has some minimum requirements as outlined below.
+
+## Prerequisites
+
+- A virtual machine or a bare-metal server with a Linux-based distribution and the **x86_64** architecture
+- [Docker](https://docs.docker.com/get-docker/) and [Firecracker](https://github.com/firecracker-microvm/firecracker/blob/main/docs/getting-started.md) installed on the host
+- [Morty CLI](https://github.com/morty-faas/cli) installed on your local machine
+
+<Callout type="info">
+  [Morty CLI](https://github.com/morty-faas/cli) is available for all
+  architectures.
+</Callout>
+
+## Install RIK
+
+The first step is to deploy a [RIK](https://github.com/rik-org/rik) cluster on your server. [RIK](https://github.com/rik-org/rik) is the orchestrator that will be used by Morty to schedule [Firecracker](https://firecracker-microvm.github.io/) microVMs.
+
+<Steps>
+
+### Download binaries
+
+You can download the latest RIK binaries from the [releases page of the RIK repository](https://github.com/rik-org/rik/releases/latest). Here, we will install the version `v1.0.0` of RIK.
+
+```bash
+# Download the release artifacts
+curl -sL "https://github.com/rik-org/rik/releases/download/v1.0.0/rik-v1.0.0-x86_64.tar.gz" --output rik.tar.gz
+mkdir -p rik
+tar -xvf rik.tar.gz -C rik
+
+# Remove files that will not be useful here
+rm -rf rik.tar.gz rik/LICENSE rik/README.md rik/rikctl
+```
+
+Now, if you run `tree` in your current directory, you should have something like this into the `rik` folder:
+
+```bash
+tree
+
+-- rik
+    |-- controller
+    |-- riklet
+    |-- scheduler
+
+1 directory, 3 files
+```
+
+Move those binaries into `/usr/bin` :
+
+```bash
+sudo mv ./rik/* /usr/bin
+```
+
+### Install components
+
+Now that you have gathered all the RIK components, you need to install them on your system. To do so, we will use systemd services here to run our stack. To install our different components, we will use a `service.tpl` file to make the installation easier. Create this file in your current working directory and place the following content inside :
+
+```bash
+# service.tpl
+[Unit]
+AssertPathExists=${BIN}
+
+[Service]
+WorkingDirectory=~
+EnvironmentFile=${ENV_FILE}
+ExecStart=${BIN} ${ARGS}
+Restart=always
+NoNewPrivileges=true
+RestartSec=3
+
+[Install]
+Alias=${NAME}
+WantedBy=default.target
+```
+
+#### RIK Scheduler
+
+To install the scheduler, use the following command :
+
+```bash
+# Generate the service file based on the template
+NAME="rik-scheduler" ARGS="" BIN="/usr/bin/scheduler" envsubst < service.tpl | sudo tee /etc/systemd/system/rik-scheduler.service
+
+# Enable your service
+sudo systemctl enable rik-scheduler
+sudo systemctl start rik-scheduler
+```
+
+#### RIK Controller
+
+To install the controller, use the following command :
+
+```bash
+# Generate the service file based on the template
+NAME="rik-controller" ARGS="" BIN="/usr/bin/controller" envsubst < service.tpl | sudo tee /etc/systemd/system/rik-controller.service
+
+# Enable and start your service
+sudo systemctl enable rik-controller
+sudo systemctl start rik-controller
+```
+
+#### RIKLET
+
+<Callout type="warning" emoji="⚠️">
+  The riklet will create some `iptables` rules at boot time. We strongly
+  recommend to backup your `iptables` rules in case you need to restore them :
+
+```bash
+sudo iptables-save > iptables.rules.old
+```
+
+</Callout>
+
+To install the riklet, we will first need to determine the name and the IP of the network interface that is connected to internet. Run the following command to retrieve it :
+
+```bash
+export IF_NET=$(ip route get 8.8.8.8 | head -n1 | awk '{print $5}')
+export IF_NET_IP=$(ip -f inet addr show "${IF_NET}" | awk '/inet / {print $2}' | cut -d "/" -f 1)
+```
+
+You also need to export the path of your `firecracker` binary on the host :
+
+```bash
+# If it is on your path, else put the path where you have installed it
+export FIRECRACKER_PATH=$(which firecracker)
+```
+
+Finally, you need to download a custom linux kernel. It is needed to run Firecracker microVMs:
+
+```bash
+sudo mkdir -p /etc/riklet/
+sudo curl -sL "https://morty-faas.github.io/morty-kernel.bin" --output /etc/riklet/morty-kernel.bin
+```
+
+Now, you can run the following command to generate the service file :
+
+```bash
+# Generate the service file based on the template
+NAME=riklet BIN=/usr/bin/riklet ARGS="--master-ip localhost:4995 --firecracker-path ${FIRECRACKER_PATH} --kernel-path /etc/riklet/morty-kernel.bin --ifnet ${IF_NET} --ifnet-ip ${IF_NET_IP}" envsubst < service.tpl | sudo tee /etc/systemd/system/riklet.service
+
+# Enable and start your service
+sudo systemctl enable riklet
+sudo systemctl start riklet
+```
+
+### Verify the installation
+
+Run the following commands to verify that all the services are running:
+
+```bash
+systemctl is-active rik-scheduler
+systemctl is-active rik-controller
+systemctl is-active riklet
+
+# You should have the following output:
+active
+active
+active
+```
+
+Now, your RIK cluster API is up and running on http://localhost:5000. You need now to install Morty.
+
+</Steps>
+
+## Install Morty
+
+Now that the orchestrator is successfully installed, we can install and configure Morty.
+
+<Steps>
+
+### Download binaries
+
+You can download the latest Morty binaries from their releases pages on GitHub: [controller](https://github.com/morty-faas/controller/releases/latest) and [registry](https://github.com/morty-faas/registry/releases/latest). Here, we will install the `v1.0.0` of those components.
+
+```bash
+# Download the release artifacts
+curl -sL "https://github.com/morty-faas/controller/releases/download/v1.0.0/gateway-v1.0.0-linux-amd64.tar.gz" --output controller.tar.gz
+curl -sL "https://github.com/morty-faas/registry/releases/download/v1.0.0/registry-v1.0.0-linux-amd64.tar.gz" --output registry.tar.gz
+
+mkdir -p morty
+tar -xvf controller.tar.gz -C morty
+tar -xvf registry.tar.gz -C morty
+```
+
+Now, if you run `tree` in your current directory, you should have something like this into the `rik` folder:
+
+```bash
+tree
+
+-- morty
+    |-- gateway
+    |-- registry
+
+1 directory, 2 files
+```
+
+Move those binaries into `/usr/bin` :
+
+```bash
+sudo mv ./morty/* /usr/bin
+```
+
+### Install components
+
+#### Dependencies
+
+First of all, we need to deploy a [MinIO](https://min.io/?utm_term=minio&utm_campaign=MinIO-Search-Google+Build+-+International&utm_source=adwords&utm_medium=ppc&hsa_acc=8976569894&hsa_cam=11154547880&hsa_grp=108939911709&hsa_ad=466333759841&hsa_src=g&hsa_tgt=kwd-301105367935&hsa_kw=minio&hsa_mt=p&hsa_net=adwords&hsa_ver=3&gclid=CjwKCAjw9J2iBhBPEiwAErwpefMN2BO_lfKYbrE08HadeSb7aV3Zi88X42aFv997ADNphFx9KULYnhoCKLYQAvD_BwE) and a [Redis](https://redis.io/) instance to store functions images and function state. To keep this guide as simple as possible, we will use [Docker Compose](https://docs.docker.com/compose/).
+
+<Callout type="warning" emoji="⚠️">
+  For production environments, consider adding security to dependencies such as
+  authentication, encryption etc.
+</Callout>
+
+Create a `docker-compose.yml` file, and place the following content :
+
+```yaml
+# docker-compose.yml
+
+version: "3.8"
+services:
+  redis:
+    container_name: morty.redis
+    image: redis:7.0.10-bullseye
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - redis:/data
+
+  minio:
+    image: minio/minio:RELEASE.2022-09-25T15-44-53Z
+    container_name: morty.minio
+    restart: "unless-stopped"
+    volumes:
+      - minio-data:/data
+    environment:
+      # Do not use those credentials in production
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server --address 0.0.0.0:9000 --console-address ":9001" /data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    healthcheck:
+      test: curl -f "http://localhost:9000/minio/health/live
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+volumes:
+  minio-data:
+  redis:
+```
+
+Now, you can start Redis and MinIO using the following command:
+
+```bash
+docker compose up -d
+```
+
+Check that your containers are running:
+
+```bash
+docker ps | grep morty
+
+# You should have a similar output
+570c16049585   redis:7.0.10-bullseye                      "docker-entrypoint.s…"   7 seconds ago   Up 2 seconds                       0.0.0.0:6379->6379/tcp, :::6379->6379/tcp                       morty.redis
+933de008a7cf   minio/minio:RELEASE.2022-09-25T15-44-53Z   "/usr/bin/docker-ent…"   2 minutes ago   Up 39 seconds (health: starting)   0.0.0.0:9000-9001->9000-9001/tcp, :::9000-9001->9000-9001/tcp   morty.minio
+```
+
+Open http://localhost:9001 in your browser, enter your credentials (minioadmin, minioadmin) and create a bucket `functions` with default settings.
+
+#### Controller
+
+To install the Morty controller, you need first to create a configuration file in `/etc/morty/controller.yaml`:
+
+```yaml
+# /etc/morty/controller.yaml
+port: 8080
+
+orchestrator:
+  rik:
+    # Here replace the ${IF_NET_IP} by the IP of your network interface.
+    # You should have it in your environment if you've correctly installed the RIK orchestrator.
+    cluster: http://${IF_NET_IP}:5000
+
+state:
+  redis:
+    addr: localhost:6379
+```
+
+Now, you can generate the service file for the Morty controller:
+
+```bash
+# Generate the service file based on the template
+NAME="morty-controller" BIN="/usr/bin/gateway" ARGS="" envsubst < service.tpl | sudo tee /etc/systemd/system/morty-controller.service
+
+# Enable your service
+sudo systemctl enable morty-controller
+sudo systemctl start morty-controller
+```
+
+#### Registry
+
+Like the controller, you need to create a configuration file to install the registry. Create a file `/etc/morty-registry/registry.yaml`:
+
+```bash
+mkdir -p /etc/morty-registry
+cat <<EOF | sudo tee /etc/morty-registry/registry.yaml
+port: 8081
+storage:
+  s3:
+    endpoint: http://localhost:9000
+EOF
+```
+
+Also, create an environment in `/etc/morty-registry/env.sh` file for the process. **This step is temporary and will be removed in future versions.**
+
+```bash
+cat <<EOF | sudo tee /etc/morty-registry/env.sh
+AWS_ACCESS_KEY_ID=minioadmin
+AWS_SECRET_ACCESS_KEY=minioadmin
+EOF
+```
+
+Now, you can generate and start your service:
+
+```bash
+# Generate the service file based on the template
+NAME="morty-registry" ARGS="" BIN="/usr/bin/registry" ENV_FILE="/etc/morty-registry/env.sh" envsubst < service.tpl | sudo tee /etc/systemd/system/morty-registry.service
+
+# Enable your service
+sudo systemctl enable morty-registry
+sudo systemctl start morty-registry
+```
+
+### Verify the installation
+
+Run the following commands to verify that all the services are running:
+
+```bash
+systemctl is-active morty-controller
+systemctl is-active morty-registry
+
+# You should have the following output:
+active
+active
+```
+
+</Steps>
+
+## Check that your Morty instance is up and running
+
+Congratulations, if you read this line, it probably means that you had successfully deployed Morty ! But now, we need to test the instance by creating a simple function using the [Morty CLI](https://github.com/morty-faas/cli).
+
+On your local machine, configure a new context to be able to communicate with your fresh instance. Don't forget to replace `$IP` with the IP address of your server:
+
+```bash
+morty config add-context my-morty --gateway http://$IP:8080 --registry http://$IP:8081
+```
+
+Now, you can create a very basic function from the runtimes:
+
+```bash
+# Create the function based on Go runtime
+morty fn init --runtime go-1.19 my-first-function
+
+# Build the function before invoking it
+morty fn build my-first-function
+```
+
+Finally, you can invoke your function :
+
+```bash
+morty fn invoke my-first-function
+```
+
+If everything is ok, you should have the following output:
+
+```json
+{ "message": "Hello, World!" }
+```
+
+## Conclusion
+
+Congratulations ! You have successfully installed Morty and ran your first function !
