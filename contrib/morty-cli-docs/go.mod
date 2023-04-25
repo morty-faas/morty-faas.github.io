@@ -3,7 +3,7 @@ module cli-doc-gen
 go 1.19
 
 require (
-	github.com/morty-faas/cli v1.0.0
+	github.com/morty-faas/cli v1.0.3
 	github.com/spf13/cobra v1.7.0
 	golang.org/x/text v0.7.0
 )
@@ -41,10 +41,10 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/go-testing-interface v1.14.1 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
+	github.com/morty-faas/controller v1.0.0 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/oliveagle/jsonpath v0.0.0-20180606110733-2e52cf6e6852 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
-	github.com/polyxia-org/morty-gateway v0.2.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/spf13/afero v1.9.3 // indirect
