@@ -1,0 +1,103 @@
+---
+title: QuickStart
+---
+
+import { Tab, Tabs } from 'nextra-theme-docs'
+
+# Build your first serverless application with Morty
+
+## Prerequisites
+
+- [Morty cli](https://github.com/morty-faas/cli) (>= 1.0.0)
+- [Morty instance](./deployment)
+
+## Create your first function
+
+<Tabs items={['NodeJS', 'Go']} defaultIndex='1'>
+  <Tab>
+    ```bash
+    morty function init -r node-19 first-function
+    -> Success ! Your function 'first-function' has been initialized into './first-function'
+    ```
+  </Tab>
+  <Tab>
+    ```bash
+    morty function init -r go-1.19 first-function
+    -> Success ! Your function 'first-function' has been initialized into './first-function'
+    ```
+  </Tab>
+</Tabs>
+
+```bash
+cd first-function
+```
+
+<Tabs items={['NodeJS', 'Go']} defaultIndex='1'>
+  After the initialization, you should have the following files:
+  <Tab>
+   - handler.js
+   - morty.yaml
+   - package.json
+  </Tab>
+  <Tab>
+   - handler.go
+   - morty.yaml
+   - go.mod
+  </Tab>
+</Tabs>
+
+## Customize your function
+
+<Tabs items={['NodeJS', 'Go']} defaultIndex='1'>
+  <Tab>
+    You can now edit your function in the `handler.js` file.
+
+    ```js
+    exports.handler = async function (req, res) {
+      return res.status(200).send(JSON.stringify('My first function !'))
+    }
+    ```
+
+  </Tab>
+  <Tab>
+    You can now edit your function in the `handler.go` file.
+
+    ```go
+    package function
+
+    import (
+      "net/http"
+      "encoding/json"
+    )
+
+    func Handler (w http.ResponseWriter, r \*http.Request) {
+      w.Header().Set("Content-Type", "application/json; charset=utf-8")
+      w.WriteHeader(http.StatusOK)
+      json.NewEncoder(w).Encode(map[string]string{"message": "Hello, World!"})
+    }
+    ```
+
+  </Tab>
+</Tabs>
+
+## Deploy your function
+
+Define your context configuration. You can use the `quickstart` context to deploy your function on Morty's quickstart environment.
+For this example we use default values for the context configuration.  
+_You need to have a running Morty registry on [localhost:8081](http://localhost:8081) and a running Morty gateway on [localhost:8080](http://localhost:8080)_.
+
+```bash
+morty config add-context quickstart
+```
+
+Now we are ready to deploy our function. Using build command will deploy our function code to the registry and automaticcally inform the gateway that our function is available.
+
+```bash
+morty function build ./first-function
+```
+
+To test our function, we can use the `invoke` command.
+
+```bash
+morty function invoke first-function
+```
