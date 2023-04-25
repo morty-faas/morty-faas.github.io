@@ -25,6 +25,77 @@ This will create a new project in the `serverless-api` directory. The `-r` flag 
 
 ## Create our function
 
+Update the `serverless-api/handler.js` file with the following content:
+
+```js
+// In-memory database
+// Only for demo purposes, do not use in production
+let users = [
+  { id: 1, name: "John Doe" },
+  { id: 2, name: "Alicia Lacoupe" },
+  { id: 3, name: "Josh Dupont" }
+];
+
+const getAllUsers = () => {
+  return users;
+};
+
+const getUserById = (id) => {
+  return users.find((user) => user.id == id);
+};
+
+const createUser = (user) => {
+  users.push(user);
+  return user;
+};
+
+const updateUser = (id, user) => {
+  const index = users.findIndex((user) => user.id == id);
+  users[index] = { ...users[index], ...user };
+  return users[index];
+};
+
+const deleteUser = (id) => {
+  users = users.filter((user) => user.id != id);
+  return users;
+};
+
+// Export our functions as a module
+exports.handler = async function (req, res) {
+  // Get the request method, query parameters and body (req is an express request object)
+  const { method, query, body } = req;
+
+  switch (method) {
+    case "GET":
+      const response = query.userId ? getUserById(query.userId) : getAllUsers();
+      return res.status(200).send(JSON.stringify(response));
+    case "POST":
+      if (!body || body === "" || body === "{}") {
+        return res.status(400).send("Missing body");
+      }
+      const user = createUser(JSON.parse(body));
+      return res.status(200).send(JSON.stringify(user));
+    case "PUT":
+      if (!query.userId) {
+        return res.status(400).send("Missing userId");
+      }
+      if (!body) {
+        return res.status(400).send("Missing body");
+      }
+      const updatedUser = updateUser(query.userId, body);
+      return res.status(200).send(JSON.stringify(updatedUser));
+    case "DELETE":
+      if (!query.userId) {
+        return res.status(400).send("Missing userId");
+      }
+      const isDeleted = deleteUser(query.userId);
+      return res.status(200).send(JSON.stringify(isDeleted));
+    default:
+      return res.status(405).end(`Method ${method} Not Allowed`);
+  }
+};
+```
+
 ## Deploy our function
 
 To deploy our function, run the following command:
@@ -65,7 +136,7 @@ Response :
 **Create a new user**
 
 ```bash
-morty function invoke serverless-api -X POST -d "{ id: 4, name: 'Jack Sparrow' }"
+morty function invoke serverless-api -X POST -d "{ id: 4, name: 'Jack Sparrow' }" -H "Content-Type: application/json"
 ```
 
 Response :
@@ -80,7 +151,7 @@ Response :
 **Update a user**
 
 ```bash
-morty function invoke serverless-api1 -X PUT -p userId=2 -d "{ name: 'Serge Blanco' }"
+morty function invoke serverless-api1 -X PUT -p userId=2 -d "{ name: 'Serge Blanco' }" -H "Content-Type: application/json"
 ```
 
 Response :
@@ -116,5 +187,14 @@ morty function invoke serverless-api1 -X DELETE -p userId=2
 Response :
 
 ```json
-true
+[
+  {
+    "id": 1,
+    "name": "John Doe"
+  },
+  {
+    "id": 3,
+    "name": "Josh Dupont"
+  }
+]
 ```
