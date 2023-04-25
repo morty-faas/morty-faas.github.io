@@ -19,6 +19,13 @@ function Logo() {
 
 export default {
   logo: <Logo />,
+  banner: {
+    text: (
+      <a href="https://github.com/morty-faas/morty-faas.github.io/issues/new/choose" target="_blank">
+       <strong>Morty's documentation is under construction.</strong> Give us your feedback →
+      </a>
+    ),
+  },
   primaryHue: {
     dark: 270,
     light: 270,

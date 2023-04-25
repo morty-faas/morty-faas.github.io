@@ -35,4 +35,5 @@ yarn-error.log*
 next-env.d.ts
 
 dist
-pages/docs/cli/**.md
+pages/cli/**.md
+pages/cli.md

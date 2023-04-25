@@ -1,11 +1,21 @@
 {
-  "index": {
-    "title": "Morty",
-    "type": "page",
-    "display": "hidden"
+  "-- Getting Started --": {
+    "type": "separator",
+    "title": "Getting Started"
   },
-  "docs": {
-    "title": "Documentation",
-    "type": "page"
+  "index": "Introduction",
+  "-- API Reference --": {
+    "type": "separator",
+    "title": "API Reference"
+  },
+  "cli": "CLI",
+  "-- More --": {
+    "type": "separator",
+    "title": "Internals"
+  },
+  "architecture": "Architecture",
+  "-- Developer --": {
+    "type": "separator",
+    "title": "Developer Guide"
   }
 }

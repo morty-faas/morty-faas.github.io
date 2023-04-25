@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	basePath   = "../../pages/docs/cli"
+	basePath   = "../../pages/cli"
 	fmTemplate = `---
 title: "%s"
 ---
@@ -37,9 +37,9 @@ func main() {
 	err := doc.GenMarkdownTreeCustom(cmd.RootCmd, basePath, filePrepender, func(s string) string {
 		base := strings.TrimSuffix(s, path.Ext(s))
 		if base == "morty" {
-			return "/docs/cli"
+			return "/cli"
 		}
-		return "/docs/cli/" + strings.Replace(base, "_", "-", -1)
+		return "/cli/" + strings.Replace(base, "_", "-", -1)
 	})
 	if err != nil {
 		log.Fatal(err)
