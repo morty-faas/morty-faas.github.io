@@ -60,6 +60,7 @@ export default {
     return <>
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <meta name="title" content={title}/>
+      <meta name="theme-color" content="#321A4C" />
       <meta name="description" content={description}/>
 
       <meta property="og:type" content="website"/>
