@@ -5,6 +5,7 @@
   },
   "index": "Introduction",
   "quickstart": "Quickstart",
+  "deployment": "Deployment",
   "-- Recipes --": {
     "type": "separator",
     "title": "Recipes"
@@ -26,6 +27,5 @@
     "type": "separator",
     "title": "Developer Guide"
   },
-  "deployment": "Deployment",
   "contribute": "Contributing"
 }

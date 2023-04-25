@@ -1,103 +1,90 @@
 ---
-title: QuickStart
+title: Quickstart
+description: Learn how to create your first function in Morty.
 ---
-
 import { Tab, Tabs } from 'nextra-theme-docs'
+import { Callout } from "nextra-theme-docs";
 
 # Build your first serverless application with Morty
 
+This guide will help you to create your first function using the Morty serverless platform. We apologize, we do not provide at today a sandbox environment where you can play with Morty in seconds. Be sure that it is on our roadmap and we will try to provide you a fully functional Morty environment soon.
+
 ## Prerequisites
 
-- [Morty cli](https://github.com/morty-faas/cli) (>= 1.0.0)
-- [Morty instance](./deployment)
+- A Morty instance up and running. Please refer to the [deployment guide](./deployment.mdx) to deploy Morty on your own infrastructure.
+- The [Morty CLI](https://github.com/morty-faas/cli) (>= 1.0.0) must be installed on your machine. You can install it using the following convenience script: 
+```bash
+curl -fsSL https://morty-faas.github.io/install-cli.sh | sudo sh
+```
+
 
 ## Create your first function
 
-<Tabs items={['NodeJS', 'Go']} defaultIndex='1'>
-  <Tab>
-    ```bash
-    morty function init -r node-19 first-function
-    -> Success ! Your function 'first-function' has been initialized into './first-function'
-    ```
-  </Tab>
-  <Tab>
-    ```bash
-    morty function init -r go-1.19 first-function
-    -> Success ! Your function 'first-function' has been initialized into './first-function'
-    ```
-  </Tab>
-</Tabs>
+In this section, you will create your first function with your favorite language. Morty has a notion of [runtime](./runtimes.mdx). Multiple runtimes can be contributed for one specific language. You can list the available runtimes using the following command: 
 
 ```bash
-cd first-function
+morty runtime list
 ```
 
-<Tabs items={['NodeJS', 'Go']} defaultIndex='1'>
-  After the initialization, you should have the following files:
-  <Tab>
-   - handler.js
-   - morty.yaml
-   - package.json
-  </Tab>
-  <Tab>
-   - handler.go
-   - morty.yaml
-   - go.mod
-  </Tab>
-</Tabs>
-
-## Customize your function
-
-<Tabs items={['NodeJS', 'Go']} defaultIndex='1'>
-  <Tab>
-    You can now edit your function in the `handler.js` file.
-
-    ```js
-    exports.handler = async function (req, res) {
-      return res.status(200).send(JSON.stringify('My first function !'))
-    }
-    ```
-
-  </Tab>
-  <Tab>
-    You can now edit your function in the `handler.go` file.
-
-    ```go
-    package function
-
-    import (
-      "net/http"
-      "encoding/json"
-    )
-
-    func Handler (w http.ResponseWriter, r \*http.Request) {
-      w.Header().Set("Content-Type", "application/json; charset=utf-8")
-      w.WriteHeader(http.StatusOK)
-      json.NewEncoder(w).Encode(map[string]string{"message": "Hello, World!"})
-    }
-    ```
-
-  </Tab>
-</Tabs>
-
-## Deploy your function
-
-Define your context configuration. You can use the `quickstart` context to deploy your function on Morty's quickstart environment.
-For this example we use default values for the context configuration.  
-_You need to have a running Morty registry on [localhost:8081](http://localhost:8081) and a running Morty gateway on [localhost:8080](http://localhost:8080)_.
+You should have an output like :
 
 ```bash
-morty config add-context quickstart
+Available runtimes:
+- go-1.19
+- node-19
+- python-3
+- rust-1.67
 ```
 
-Now we are ready to deploy our function. Using build command will deploy our function code to the registry and automaticcally inform the gateway that our function is available.
+Choose your runtime based on what languages you prefer. For the rest of this document, we will use the `go-1.19` runtime. You can find all the runtimes in the following [GitHub repository](https://github.com/morty-faas/runtimes) . You can now create a new function based on the chosen runtime:
 
 ```bash
-morty function build ./first-function
+morty fn init --runtime go-1.19 morty-quickstart
 ```
 
-To test our function, we can use the `invoke` command.
+This command will create a directory `morty-quickstart` in your current working directory. This directory contains your function code. You can open it in your favorite IDE or code editor to check the files present. For a `go-1.19` runtime, the folder structure will look like:
 
 ```bash
-morty function invoke first-function
+morty-quickstart
+├── go.mod
+├── handler.go
+└── morty.yaml
 ```
+
+The `morty.yaml` file is a special file that holds the function metadata. **This file should not be removed and should be included in your version control.** The `handler.go` file contains the function code, and the `go.mod` allows you to install external Go modules to empower your function. 
+
+You can customize your function as you want. When the function is ready, you are ready to [build it](#build-the-function).
+
+## Build the function
+
+<Callout type="warning" emoji="⚠️">
+  This section requires an up and running Morty instance. If you don't have acces to an instance,
+  you can deploy your own instance by following the [deployment guide](./deployment.mdx).
+</Callout>
+
+In order to build and invoke your functions, you need to define a **context** in your CLI. A **context** is simply a configuration related to a specific Morty instance. Let's configure your context based on the Morty instance you target (replace `${MORTY_CONTROLLER_URL}` and `${MORTY_REGISTRY_URL}` by your own instance URLs) :
+
+
+```bash
+morty config add-context quickstart --gateway ${MORTY_CONTROLLER_URL} --registry ${MORTY_REGISTRY_URL}
+```
+
+The added context is now the default context. You can now run the build of your function. The build command will send a build request to the registry, and once the build is done, the function will be provisioned through the controller. Execute the following command to build the function :
+
+<Callout type="info">
+  "Provisioned" means that the function was registered into the system but no instance was deployed. The deployment of one or more instances happens during the invocation of a function.
+</Callout>
+
+```bash
+morty function build morty-quickstart
+```
+
+Your function is now ready to be invoked. Execute the following command and let the magic happen !
+
+```bash
+morty function invoke morty-quickstart
+# output
+{"message": "Hello, World!"}
+```
+
+Congratulations! You had successfully created and invoked your first function using Morty 🚀.
