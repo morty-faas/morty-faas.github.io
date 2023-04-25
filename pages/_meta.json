@@ -5,6 +5,11 @@
   },
   "index": "Introduction",
   "quickstart": "Quickstart",
+  "-- Recipes --": {
+    "type": "separator",
+    "title": "Recipes"
+  },
+  "serverless-api": "Serverless API",
   "-- API Reference --": {
     "type": "separator",
     "title": "API Reference"

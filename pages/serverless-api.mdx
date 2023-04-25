@@ -1,0 +1,120 @@
+---
+title: Serverless API
+---
+
+# Build your own serverless API
+
+## Introduction
+
+In this tutorial, you will learn how to build a serverless API using [Morty](/). You will create a simple API that returns a list of users. You will also learn how to deploy your API to the cloud.
+
+## Prerequisites
+
+- [Morty cli](https://github.com/morty-faas/cli) (>= 1.0.0)
+- [Morty instance](./deployment)
+
+## Create a new project
+
+To create a new project, run the following command:
+
+```bash
+morty function init -r node-19 serverless-api
+```
+
+This will create a new project in the `serverless-api` directory. The `-r` flag specifies the runtime to use. In this case, we will use the `node-19` runtime.
+
+## Create our function
+
+## Deploy our function
+
+To deploy our function, run the following command:
+
+```bash
+morty function build ./serverless-api
+```
+
+## Test our function
+
+To test our function, run the following command:
+
+**Get all users**
+
+```bash
+morty function invoke serverless-api -X GET
+```
+
+Response :
+
+```json
+[
+  {
+    "id": 1,
+    "name": "John Doe"
+  },
+  {
+    "id": 2,
+    "name": "Alicia Lacoupe"
+  },
+  {
+    "id": 3,
+    "name": "Josh Dupont"
+  }
+]
+```
+
+**Create a new user**
+
+```bash
+morty function invoke serverless-api -X POST -d "{ id: 4, name: 'Jack Sparrow' }"
+```
+
+Response :
+
+```json
+{
+  "id":4,
+  "name":"Jack Sparrow"
+}
+```
+
+**Update a user**
+
+```bash
+morty function invoke serverless-api1 -X PUT -p userId=2 -d "{ name: 'Serge Blanco' }"
+```
+
+Response :
+
+```json
+{
+  "id":2,
+  "name":"Serge Blanco"
+}
+```
+
+**Get a user by id**
+
+```bash
+morty function invoke serverless-api1 -X GET -p userId=2
+```
+
+Response :
+
+```json
+{
+  "id":2,
+  "name":"Serge Blanco"
+}
+```
+
+**Delete a user**
+
+```bash
+morty function invoke serverless-api1 -X DELETE -p userId=2
+```
+
+Response :
+
+```json
+true
+```
