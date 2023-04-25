@@ -25,7 +25,7 @@ export default {
   banner: {
     text: (
       <a
-        href='https://github.com/morty-faas/morty-faas.github.io/issues/new/choose'
+        href='https://github.com/morty-faas/morty-faas.github.io/issues/new?title=Feedback%20for%20%E2%80%9CMorty%E2%80%9D&labels=feedback'
         target='_blank'
       >
         <strong>Morty's documentation is under construction.</strong> Give us
