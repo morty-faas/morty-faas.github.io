@@ -23,7 +23,7 @@ First, you have to create an issue in the right component. Depending on what cha
 
 Once your issue is ready, fork the repository in order to do your changes freely without affecting the original project.
 
-> See [GitHub - Fork a repo](https://docs.github.com/en/issues/tracking-your-work-with-issues/creating-an-issue).
+> See [GitHub - Fork a repository](https://docs.github.com/en/issues/tracking-your-work-with-issues/creating-an-issue).
 
 ### Open a Pull Request
 
@@ -31,14 +31,14 @@ When you are creating a pull request, consider using templates provided and fill
 
 ### Review flow
 
-**Your pull request have to be rebased before asking for merge**
+**Your pull request needs to be up to date with the latest changes before asking for merge**
 
 When your Pull Request is ready to be reviewed, you can ask for "review" using github pull requests parameters.
 
-The Pull Request will be checked in a first step by a maintainer using the following criterias:
+The Pull Request will be checked in a first step by a maintainer using the following criteria:
 
-- [x] Rebased and don't have merge conflict
-- [x] Code explainations and documentation provided
+- [x] Up to date and no merge conflict
+- [x] Code explanations and documentation provided
 - [x] Unitary tests or procedure to test the feature provided
 - [x] Pull request have a description of the feature objectives provided
 
@@ -48,7 +48,7 @@ NOTE: A pull request need at least 1 approvals to be merged.
 
 ## Commits conventions
 
-Our commit convention folow the [Conventional Commits 1.0.0-beta.4](https://www.conventionalcommits.org/en/v1.0.0-beta.4/)
+Our commit convention follow the [Conventional Commits 1.0.0-beta.4](https://www.conventionalcommits.org/en/v1.0.0-beta.4/)
 
 To be more explicit, we will describe below the commit conventions message.
 
