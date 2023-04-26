@@ -204,12 +204,12 @@ Now that the orchestrator is successfully installed, we can install and configur
 
 ### Download binaries
 
-You can download the latest Morty binaries from their releases pages on GitHub: [controller](https://github.com/morty-faas/controller/releases/latest) and [registry](https://github.com/morty-faas/registry/releases/latest). Here, we will install the `v1.0.0` of those components.
+You can download the latest Morty binaries from their releases pages on GitHub: [controller and registry](https://github.com/morty-faas/morty/releases/latest). Here, we will install the `v1.0.0` of those components.
 
 ```bash
 # Download the release artifacts
-curl -sL "https://github.com/morty-faas/controller/releases/download/v1.0.0/gateway-v1.0.0-linux-amd64.tar.gz" --output controller.tar.gz
-curl -sL "https://github.com/morty-faas/registry/releases/download/v1.0.0/registry-v1.0.0-linux-amd64.tar.gz" --output registry.tar.gz
+curl -sL "https://github.com/morty-faas/morty/releases/download/v1.0.0/morty-controller-v1.0.0-linux-amd64.tar.gz" --output controller.tar.gz
+curl -sL "https://github.com/morty-faas/morty/releases/download/v1.0.0/morty-registry-v1.0.0-linux-amd64.tar.gz" --output registry.tar.gz
 
 mkdir -p morty
 tar -xvf controller.tar.gz -C morty
