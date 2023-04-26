@@ -1,5 +1,7 @@
 import { useRouter } from 'next/router'
 import { useConfig } from 'nextra-theme-docs'
+import { useEffect, useState } from 'react';
+import { useSpring, animated } from '@react-spring/web';
 
 function Logo() {
   return (
@@ -20,6 +22,62 @@ function Logo() {
   )
 }
 
+function Numbers({n}) {
+  const { number } = useSpring({
+    from: { number: 0 },
+    number: n,
+    delay: 200,
+    config: { mass: 1, tension: 20, friction: 10  },
+  })
+  return <animated.p className='nx-text-xs'>{number.to((n) => n.toFixed(0))}</animated.p>
+}
+
+function ProjectStars() {
+  const [stars, setStars] = useState(0);
+
+  useEffect(() => {
+    fetch('https://api.github.com/repos/morty-faas/morty')
+      .then(response => response.json())
+      .then(data => setStars(data.stargazers_count));
+  }, []);
+
+
+  return (
+    <a style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+    }}
+      href="https://github.com/morty-faas/morty"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <div
+      style={{
+        borderRadius: '5px 0 0 5px',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+      className="nx-border nx-border-gray-300 dark:nx-border-gray-600 nx-py-1 nx-px-2">
+      <p className='nx-text-xs'>⭐ Star</p>
+      </div>
+      <div 
+      style={{
+        borderRadius: '0 5px 5px 0',
+        borderLeft: 'none',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        overflow: 'hidden',
+      }}
+      className="nx-border nx-border-gray-300 dark:nx-border-gray-600 nx-py-1 nx-px-2">
+        <Numbers n={stars}/>
+      </div>
+    </a>
+  )
+}
+
 export default {
   logo: <Logo />,
   banner: {
@@ -32,6 +90,9 @@ export default {
         your feedback →
       </a>
     ),
+  },
+  navbar: {
+    extraContent: <ProjectStars/>
   },
   primaryHue: {
     dark: 270,
