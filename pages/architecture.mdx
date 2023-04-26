@@ -14,9 +14,9 @@ This page describes the high-level architecture of Morty. The goal of this docum
 Currently, Morty has 4 components :
 
 - [Morty CLI](https://github.com/morty-faas/cli): The CLI allows developer to create, build and invoke functions.
-- [Morty Controller](https://github.com/morty-fass/gateway): The controller is responsible for managing functions of a Morty instance. It will maintain a state of all the registered functions, and will communicate with the underlying orchestrator to ask for instances when needed. Please see below for [compatible orchestration systems](#orchestration).
-- [Morty Registry](#): The registry is responsible for building and providing access to function images to the orchestrator.
-- [Alpha](#): Alpha is a little agent embedded in the function images that will fork the runtime process for your function and monitor it.
+- [Morty Controller](https://github.com/morty-faas/morty/tree/main/controller): The controller is responsible for managing functions of a Morty instance. It will maintain a state of all the registered functions, and will communicate with the underlying orchestrator to ask for instances when needed. Please see below for [compatible orchestration systems](#orchestration).
+- [Morty Registry](https://github.com/morty-faas/morty/tree/main/registry): The registry is responsible for building and providing access to function images to the orchestrator.
+- [Alpha](https://github.com/morty-faas/alpha): Alpha is a little agent embedded in the function images that will fork the runtime process for your function and monitor it.
 
 ## Orchestration
 
