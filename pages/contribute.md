@@ -9,13 +9,23 @@ Thank you for investing your time in contributing to the Morty project!
 
 In this guide you will get an overview of the contribution workflow from opening an issue, creating a PR, committing your changes, and getting your PR merged.
 
-If you are lost at any point, don't hesitate to file an issue on [GitHub](https://github.com/morty-faas/morty-faas.github.io/issues/new?assignees=&labels=question&template=question.yml&title=%5BQUESTION%5D%3A+) !
+If you are lost at any point, don't hesitate to file an issue on [GitHub](https://github.com/morty-faas/morty) !
+
+## Project Roadmap
+
+You can find the project roadmap on the [GitHub project](https://github.com/orgs/morty-faas/projects/1).
+
+## Community
+
+All the discussions related to the project must be done through the [organization discussion](https://github.com/orgs/morty-faas/discussions). Don't forget to review the project [code of conduct](https://github.com/morty-faas/morty/blob/main/CODE_OF_CONDUCT.md).
 
 ## Getting started
 
-### Create a new issue
+### Select an issue to work on
 
-First, you have to create an issue in the right component. Depending on what changes you want to bring, multiple components can be impacted. In your issue, please be as precise as possible to allow other contributors to understand what you will implement / fix. It will make it easier for other developers if you need help or if your issue does not make sense.
+First, you can explore the issues present in the different projects of the [morty-faas](https://github.com/morty-faas) organization. If you are interested by an issue, add a comment on it by tagging the `@morty-faas/core` team. This avoid conflicts between multiple development on the same issue.
+
+If your issue is not listed in any of the repositories, you can create an issue in the good repository. In your issue, please give a detailed description to allow other maintainers and other contributors to understand the subject and the implications of your request.
 
 > See [GitHub - Creating an issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/creating-an-issue).
 
