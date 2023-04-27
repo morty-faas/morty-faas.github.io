@@ -27,6 +27,115 @@ This will create a new project in the `serverless-api` directory. The `-r` flag 
 
 Update the `serverless-api/handler.js` file with the following content:
 
+First, we will create an in-memory database to store our users. We will use an array of users for this example.
+Then, we will create a set of functions to interact with our database. We will create functions to get all users, get a user by id, create a new user, update a user and delete a user.
+Finally, we will export our functions as a module. This will allow us to use our functions in our function handler.
+
+### Database
+
+For this example, we will use a simple array of users as our database.
+Of course, this is not a good idea for a production application but it will be enough for this example.
+Database will be reinitialized every time the function is instanciated. This is because the function is stateless and will be destroyed after some time of inactivity.
+
+```js
+// In-memory database
+// Only for demo purposes, do not use in production
+let users = [
+  { id: 1, name: "John Doe" },
+  { id: 2, name: "Alicia Lacoupe" },
+  { id: 3, name: "Josh Dupont" }
+];
+```
+
+### Functions
+
+To get all users, we will create a function that returns the `users` array.
+
+```js
+const getAllUsers = () => {
+  return users;
+};
+```
+
+To get a user by id, we will create a function that returns the user with the specified id.
+
+```js
+const getUserById = (id) => {
+  return users.find((user) => user.id == id);
+};
+```
+
+To create a new user, we will create a function that adds the user to the `users` array and returns the newly created user.
+
+```js
+const createUser = (user) => {
+  users.push(user);
+  return user;
+};
+```
+
+Same logic can be used to update a user. We will create a function that updates the user with the specified id and returns the updated user.
+
+```js
+const updateUser = (id, user) => {
+const index = users.findIndex((user) => user.id == id);
+users[index] = { ...users[index], ...user };
+return users[index];
+};
+```
+
+Finally, to delete a user, we will create a function that removes the user with the specified id from the `users` array and returns the updated array.
+
+```js
+const deleteUser = (id) => {
+users = users.filter((user) => user.id != id);
+return users;
+};
+```
+
+Finally, we will export our functions as a module. This will allow us to use our functions in our function handler.
+
+```js
+// Export our functions as a module
+exports.handler = async function (req, res) {
+  // Get the request method, query parameters and body (req is an express request object)
+  const { method, query, body } = req;
+
+  switch (method) {
+    case "GET":
+      const response = query.userId ? getUserById(query.userId) : getAllUsers();
+      return res.status(200).send(JSON.stringify(response));
+    case "POST":
+      if (!body || body === "" || body === "{}") {
+        return res.status(400).send("Missing body");
+      }
+      const user = createUser(JSON.parse(body));
+      return res.status(200).send(JSON.stringify(user));
+    case "PUT":
+      if (!query.userId) {
+        return res.status(400).send("Missing userId");
+      }
+      if (!body) {
+        return res.status(400).send("Missing body");
+      }
+      const updatedUser = updateUser(query.userId, body);
+      return res.status(200).send(JSON.stringify(updatedUser));
+    case "DELETE":
+      if (!query.userId) {
+        return res.status(400).send("Missing userId");
+      }
+      const isDeleted = deleteUser(query.userId);
+      return res.status(200).send(JSON.stringify(isDeleted));
+    default:
+      return res.status(405).end(`Method ${method} Not Allowed`);
+  }
+};
+```
+
+### Final code
+
+Here is the final code for our function:
+
 ```js
 // In-memory database
 // Only for demo purposes, do not use in production
