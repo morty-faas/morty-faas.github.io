@@ -268,7 +268,7 @@ services:
       - redis:/data
 
   minio:
-    image: minio/minio:RELEASE.2022-09-25T15-44-53Z
+    image: bitnami/minio:2023.4.20
     container_name: morty.minio
     restart: "unless-stopped"
     volumes:
@@ -277,7 +277,7 @@ services:
       # Do not use those credentials in production
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
-    command: server --address 0.0.0.0:9000 --console-address ":9001" /data
+      MINIO_DEFAULT_BUCKETS: "functions"
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -304,11 +304,9 @@ Check that your containers are running:
 docker ps | grep morty
 
 # You should have a similar output
-570c16049585   redis:7.0.10-bullseye                      "docker-entrypoint.s…"   7 seconds ago   Up 2 seconds                       0.0.0.0:6379->6379/tcp, :::6379->6379/tcp                       morty.redis
-933de008a7cf   minio/minio:RELEASE.2022-09-25T15-44-53Z   "/usr/bin/docker-ent…"   2 minutes ago   Up 39 seconds (health: starting)   0.0.0.0:9000-9001->9000-9001/tcp, :::9000-9001->9000-9001/tcp   morty.minio
+e42670c92ace   redis:7.0.10-bullseye        "docker-entrypoint.s…"   3 minutes ago   Up 3 minutes               0.0.0.0:6379->6379/tcp, :::6379->6379/tcp                       morty.redis
+4fd84e9e2923   bitnami/minio:2023.4.20      "/opt/bitnami/script…"   3 minutes ago   Up 3 minutes (unhealthy)   0.0.0.0:9000-9001->9000-9001/tcp, :::9000-9001->9000-9001/tcp   morty.minio
 ```
-
-Open http://localhost:9001 in your browser, enter your credentials (minioadmin, minioadmin) and create a bucket `functions` with default settings.
 
 #### Controller
 
