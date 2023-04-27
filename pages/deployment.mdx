@@ -343,7 +343,7 @@ sudo systemctl start morty-controller
 Like the controller, you need to create a configuration file to install the registry. Create a file `/etc/morty-registry/registry.yaml`:
 
 ```bash
-mkdir -p /etc/morty-registry
+sudo mkdir -p /etc/morty-registry
 cat <<EOF | sudo tee /etc/morty-registry/registry.yaml
 port: 8081
 storage:
@@ -394,7 +394,7 @@ Congratulations, if you read this line, it probably means that you had successfu
 On your local machine, configure a new context to be able to communicate with your fresh instance. Don't forget to replace `$IP` with the IP address of your server:
 
 ```bash
-morty config add-context my-morty --gateway http://$IP:8080 --registry http://$IP:8081
+morty config add-context my-morty --controller http://$IP:8080 --registry http://$IP:8081
 ```
 
 Now, you can create a very basic function from the runtimes:
