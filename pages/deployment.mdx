@@ -227,8 +227,8 @@ Now, if you run `tree` in your current directory, you should have something like
 tree
 
 -- morty
-    |-- gateway
-    |-- registry
+    |-- morty-controller
+    |-- morty-registry
 
 1 directory, 2 files
 ```
@@ -331,7 +331,7 @@ Now, you can generate the service file for the Morty controller:
 
 ```bash
 # Generate the service file based on the template
-NAME="morty-controller" BIN="/usr/bin/gateway" ARGS="" envsubst < service.tpl | sudo tee /etc/systemd/system/morty-controller.service
+NAME="morty-controller" BIN="/usr/bin/morty-controller" ARGS="" envsubst < service.tpl | sudo tee /etc/systemd/system/morty-controller.service
 
 # Enable your service
 sudo systemctl enable morty-controller
@@ -365,7 +365,7 @@ Now, you can generate and start your service:
 
 ```bash
 # Generate the service file based on the template
-NAME="morty-registry" ARGS="" BIN="/usr/bin/registry" ENV_FILE="/etc/morty-registry/env.sh" envsubst < service.tpl | sudo tee /etc/systemd/system/morty-registry.service
+NAME="morty-registry" ARGS="" BIN="/usr/bin/morty-registry" ENV_FILE="/etc/morty-registry/env.sh" envsubst < service.tpl | sudo tee /etc/systemd/system/morty-registry.service
 
 # Enable your service
 sudo systemctl enable morty-registry
