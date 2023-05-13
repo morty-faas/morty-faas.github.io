@@ -63,7 +63,7 @@ You can download the latest RIK binaries from the [releases page of the RIK repo
 
 ```bash
 # Download the release artifacts
-curl -sL "https://github.com/rik-org/rik/releases/download/v1.0.0/rik-v1.0.0-x86_64.tar.gz" --output rik.tar.gz
+curl -sL "https://github.com/rik-org/rik/releases/download/v1.1.0-rc2/rik-v1.1.0-rc2-x86_64.tar.gz" --output rik.tar.gz
 mkdir -p rik
 tar -xvf rik.tar.gz -C rik
 
@@ -153,29 +153,22 @@ sudo iptables-save > iptables.rules.old
 To install the riklet, we will first need to determine the name and the IP of the network interface that is connected to internet. Run the following command to retrieve it :
 
 ```bash
-export IF_NET=$(ip route get 8.8.8.8 | head -n1 | awk '{print $5}')
-export IF_NET_IP=$(ip -f inet addr show "${IF_NET}" | awk '/inet / {print $2}' | cut -d "/" -f 1)
+export IFACE=$(ip route get 8.8.8.8 | head -n1 | awk '{print $5}')
+export IFACE_IP=$(ip -f inet addr show "${IF_NET}" | awk '/inet / {print $2}' | cut -d "/" -f 1)
 ```
 
-You also need to export the path of your `firecracker` binary on the host :
-
-```bash
-# If it is on your path, else put the path where you have installed it
-export FIRECRACKER_PATH=$(which firecracker)
-```
-
-Finally, you need to download a custom linux kernel. It is needed to run Firecracker microVMs:
+Next, you need to download a custom linux kernel. It is needed to run Firecracker microVMs:
 
 ```bash
 sudo mkdir -p /etc/riklet/
 sudo curl -sL "https://morty-faas.github.io/morty-kernel.bin" --output /etc/riklet/morty-kernel.bin
 ```
 
-Now, you can run the following command to generate the service file :
+Finally, you can run the following command to generate the service file :
 
 ```bash
 # Generate the service file based on the template
-NAME=riklet BIN=/usr/bin/riklet ARGS="--master-ip localhost:4995 --firecracker-path ${FIRECRACKER_PATH} --kernel-path /etc/riklet/morty-kernel.bin --ifnet ${IF_NET} --ifnet-ip ${IF_NET_IP}" envsubst < service.tpl | sudo tee /etc/systemd/system/riklet.service
+NAME=riklet BIN=/usr/bin/riklet ARGS="--master-ip localhost:4995 --kernel-path /etc/riklet/morty-kernel.bin --iface ${IFACE}" envsubst < service.tpl | sudo tee /etc/systemd/system/riklet.service
 
 # Enable and start your service
 sudo systemctl enable riklet
@@ -209,12 +202,12 @@ Now that the orchestrator is successfully installed, we can install and configur
 
 ### Download binaries
 
-You can download the latest Morty binaries from their releases pages on GitHub: [controller and registry](https://github.com/morty-faas/morty/releases/latest). Here, we will install the `v1.0.0` of those components.
+You can download the latest Morty binaries from their releases pages on GitHub: [controller and registry](https://github.com/morty-faas/morty/releases/latest). Here, we will install the `v1.1.0-RC1` of those components.
 
 ```bash
 # Download the release artifacts
-curl -sL "https://github.com/morty-faas/morty/releases/download/v1.0.0/morty-controller-v1.0.0-linux-amd64.tar.gz" --output controller.tar.gz
-curl -sL "https://github.com/morty-faas/morty/releases/download/v1.0.0/morty-registry-v1.0.0-linux-amd64.tar.gz" --output registry.tar.gz
+curl -sL "https://github.com/morty-faas/morty/releases/download/v1.1.0-RC1/morty-controller-v1.1.0-RC1-linux-amd64.tar.gz" --output controller.tar.gz
+curl -sL "https://github.com/morty-faas/morty/releases/download/v1.1.0-RC1/morty-registry-v1.1.0-RC1-linux-amd64.tar.gz" --output registry.tar.gz
 
 mkdir -p morty
 tar -xvf controller.tar.gz -C morty
@@ -313,13 +306,14 @@ e42670c92ace   redis:7.0.10-bullseye        "docker-entrypoint.s…"   3 minutes
 To install the Morty controller, you need first to create a configuration file in `/etc/morty/controller.yaml`:
 
 ```bash
-mkdir -p /etc/morty
+sudo mkdir -p /etc/morty
 cat <<EOF | sudo tee /etc/morty/controller.yaml
 port: 8080
+metricsPort: 8090
 
 orchestrator:
   rik:
-    cluster: http://${IF_NET_IP}:5000
+    cluster: http://${IFACE_IP}:5000
 
 state:
   redis:
