@@ -46,3 +46,4 @@ pnpm
 md
 faas
 morty
+yaml

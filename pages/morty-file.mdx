@@ -1,0 +1,22 @@
+---
+title: "Morty metadata file"
+description: Learn more about the morty.yaml file, used to provide metadata to Morty for your functions.
+---
+
+# Morty file
+
+The Morty file, also known as the `morty.yaml` file, is a special file that needs to be included in each function folder / repository. This file is mandatory, and it allow the Morty CLI to retrieve metadata such as your function name, version and runtime in order to prepare the requests to build, deploy and invoke your functions.
+
+Below an example of a valid `morty.yaml` file :
+
+```yaml
+name: debug
+version: v0.1.0
+runtime: go-1.19
+```
+
+## Reference
+
+- `name` _(string, required)_: The name of your function. **This name must be unique in the Morty instance**.
+- `version` _(string, required)_: The version of your function. This version must be a valid semantic version, and starts with `v`. For example, `1.0.0` is not a valid version, but `v1.0.0` is it.
+- `runtime` _(string, required)_: The runtime used by your function.
