@@ -154,7 +154,7 @@ To install the riklet, we will first need to determine the name and the IP of th
 
 ```bash
 export IFACE=$(ip route get 8.8.8.8 | head -n1 | awk '{print $5}')
-export IFACE_IP=$(ip -f inet addr show "${IF_NET}" | awk '/inet / {print $2}' | cut -d "/" -f 1)
+export IFACE_IP=$(ip -f inet addr show "${IFACE}" | awk '/inet / {print $2}' | cut -d "/" -f 1)
 ```
 
 Next, you need to download a custom linux kernel. It is needed to run Firecracker microVMs:
