@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/morty-faas/cli v1.2.0-RC2
 	github.com/spf13/cobra v1.7.0
-	golang.org/x/text v0.9.0
+	golang.org/x/text v0.13.0
 )
 
 require (
